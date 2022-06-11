@@ -1,11 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { ItemsContext } from '../App';
-// import { ItemsContext } from '../App';
 
-const Item = ({ item }) => {
-    const { setPreviewItem, items } = useContext(ItemsContext)
+const Item = ({ item,setPreviewItem }) => {
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>

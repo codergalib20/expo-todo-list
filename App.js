@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useEffect, useState } from 'react';
 import { Button, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-// import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 import Item from './components/Item';
 import DateTimePicker from '@react-native-community/datetimepicker';
-export const ItemsContext = createContext();
+import Preview from './components/Preview';
 export default function App() {
   const [date, setDate] = useState(new Date());
   const [items, setItems] = useState([]);
@@ -80,120 +80,121 @@ export default function App() {
     console.log(newItems);
   }
   return (
-    <ItemsContext.Provider value={{ items, deleteItem }}>
-      <View style={styles.container}>
-        {!makeNew && <View style={styles.mainWrapper}>
-          <Text style={styles.mainTitle}>Todo List</Text>
-          {/* Tdoto List */}
-          <View styles={styles.items}>
-            <ScrollView
-            >
-              {
-                items.map((item, index) => <Item
-                  item={item}
-                  key={index}
-                  deleteItem={deleteItem}
-                />)
-              }
-            </ScrollView>
-          </View>
-          <TouchableOpacity style={styles.addItem} onPress={() => setMakeNew(true)}>
-            <Text style={styles.addItemText}>+</Text>
-          </TouchableOpacity>
-          {/* <StatusBar style="light" /> */}
+    <View style={styles.container}>
+      {!previewItem && !makeNew && <View style={styles.mainWrapper}>
+        <Text style={styles.mainTitle}>Todo List</Text>
+        {/* Tdoto List */}
+        <View styles={styles.items}>
+          <ScrollView
+          >
+            {
+              items.map((item, index) => <Item
+                item={item}
+                key={index}
+                setPreviewItem={setPreviewItem}
+                deleteItem={deleteItem}
+              />)
+            }
+          </ScrollView>
         </View>
-        }
-        {/* Make a new Todo */}
-        {
-          makeNew && (<View style={styles.makeNewTodoPage}>
-            <TouchableOpacity style={styles.closeMakePageButton} onPress={() => setMakeNew(false)}>
-              <Text style={styles.closeMakePageButtonText}>X</Text>
-            </TouchableOpacity>
-            <View>
-              <Text style={styles.mainTitle}>Make a new Todo</Text>
-            </View>
-            <KeyboardAvoidingView style={styles.safeKey} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-              <View style={styles.buttonsBox}>
-                <View style={styles.buttonsBoxParent}>
-                  <Text style={styles.datePickerHeader}>Task Start Time</Text>
+        <TouchableOpacity style={styles.addItem} onPress={() => setMakeNew(true)}>
+          <Text style={styles.addItemText}>+</Text>
+        </TouchableOpacity>
+        <StatusBar style="light" />
+      </View>
+      }
+      {previewItem && <Preview previewItem={previewItem} setPreviewItem={setPreviewItem} />}
+      {/* Make a new Todo */}
+      {
+        makeNew && (<View style={styles.makeNewTodoPage}>
+          <TouchableOpacity style={styles.closeMakePageButton} onPress={() => setMakeNew(false)}>
+            <Text style={styles.closeMakePageButtonText}>X</Text>
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.mainTitle}>Make a new Todo</Text>
+          </View>
+          <KeyboardAvoidingView style={styles.safeKey} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <View style={styles.buttonsBox}>
+              <View style={styles.buttonsBoxParent}>
+                <Text style={styles.datePickerHeader}>Task Start Time</Text>
+                <View>
+                  <Button style={styles.buttonsBoxButton} title="Date" color="#06283D" onPress={() => setStartShow("startdate")} />
+                </View>
+                <View style={{ marginTop: 5 }}>
+                  <Button style={styles.buttonsBoxButton} title="Time" color="#06283D" onPress={() => setStartShow("starttime")} />
+                </View>
+              </View>
+              <View style={styles.buttonsBoxParent}>
+                <Text style={styles.datePickerHeader}>Task End Time</Text>
+                <View>
+                  <Button style={styles.buttonsBoxButton} title="Date" color="#06283D" onPress={() => setEndShow("enddate")} />
                   <View>
-                    <Button style={styles.buttonsBoxButton} title="Date" color="#06283D" onPress={() => setStartShow("startdate")} />
                   </View>
                   <View style={{ marginTop: 5 }}>
-                    <Button style={styles.buttonsBoxButton} title="Time" color="#06283D" onPress={() => setStartShow("starttime")} />
+                    <Button style={styles.buttonsBoxButton} title="Time" color="#06283D" onPress={() => setEndShow("endtime")} />
                   </View>
                 </View>
-                <View style={styles.buttonsBoxParent}>
-                  <Text style={styles.datePickerHeader}>Task End Time</Text>
-                  <View>
-                    <Button style={styles.buttonsBoxButton} title="Date" color="#06283D" onPress={() => setEndShow("enddate")} />
-                    <View>
-                    </View>
-                    <View style={{ marginTop: 5 }}>
-                      <Button style={styles.buttonsBoxButton} title="Time" color="#06283D" onPress={() => setEndShow("endtime")} />
-                    </View>
-                  </View>
-                </View>
+              </View>
+            </View>
+            <View>
+              <View>
+                {startShow === "startdate" && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={"date"}
+                    is24Hour={true}
+                    display="default"
+                    onChange={changeStartText}
+                  />
+                )}
+                {startShow === "starttime" && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={"time"}
+                    is24Hour={true}
+                    display="default"
+                    onChange={changeStartText}
+                  />
+                )}
               </View>
               <View>
-                <View>
-                  {startShow === "startdate" && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={"date"}
-                      is24Hour={true}
-                      display="default"
-                      onChange={changeStartText}
-                    />
-                  )}
-                  {startShow === "starttime" && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={"time"}
-                      is24Hour={true}
-                      display="default"
-                      onChange={changeStartText}
-                    />
-                  )}
-                </View>
-                <View>
-                  {endShow === "enddate" && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={"date"}
-                      is24Hour={true}
-                      display="default"
-                      onChange={changeEndText}
-                    />
-                  )}
-                  {endShow === "endtime" && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={"time"}
-                      is24Hour={true}
-                      display="default"
-                      onChange={changeEndText}
-                    />
-                  )}
-                </View>
+                {endShow === "enddate" && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={"date"}
+                    is24Hour={true}
+                    display="default"
+                    onChange={changeEndText}
+                  />
+                )}
+                {endShow === "endtime" && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={"time"}
+                    is24Hour={true}
+                    display="default"
+                    onChange={changeEndText}
+                  />
+                )}
               </View>
-              <View style={styles.inputWrapper}>
-                <TextInput placeholderTextColor="#ddd" defaultValue={text} onChangeText={texts => setText(texts)} style={styles.input} placeholder="Text here todo title" />
-                <TouchableOpacity onPress={() => handleAddItem()} style={styles.buttonWrapper}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonText}>+</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </KeyboardAvoidingView >
-          </View>)
-        }
-      </View >
-    </ItemsContext.Provider >
+            </View>
+            <View style={styles.inputWrapper}>
+              <TextInput placeholderTextColor="#ddd" defaultValue={text} onChangeText={texts => setText(texts)} style={styles.input} placeholder="Text here todo title" />
+              <TouchableOpacity onPress={() => handleAddItem()} style={styles.buttonWrapper}>
+                <View style={styles.button}>
+                  <Text style={styles.buttonText}>+</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView >
+          < StatusBar style="dark" />
+        </View>)
+      }
+    </View >
   );
 }
 
